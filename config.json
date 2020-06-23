@@ -1,0 +1,12 @@
+{
+  "interactive"    : false,
+  "macroName"      : "run.mac",
+  "processNumber"  : 0,
+  "gasPressure"    : 4.7,
+  "gasTemperature" : 293.15,
+  "qValue"         : -0.478,
+  "cmEnergy"       : 0.7,
+  "target"         : [2,4],
+  "lightProduct"   : [0,1],
+  "heavyProduct"   : [12,25]
+}
