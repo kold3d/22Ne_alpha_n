@@ -45,7 +45,10 @@ public:
     virtual G4VPhysicalVolume* Construct();
 //    virtual void ConstructSDandField();
 
-    void SetPressure(G4double);
+    void SetGasPressure(G4double pressure){
+        fPressureInTorr = pressure;
+        G4cout << "Set: Gas pressure: " << fPressureInTorr << G4endl;
+    };
     void SetTemperature(G4double);
     G4Material* GetGasMaterial(){return fGasMaterial;};
     G4LogicalVolume* GetWorldVolume() const {return fWorldLogical;}

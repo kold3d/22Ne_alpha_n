@@ -64,7 +64,6 @@ G4VParticleChange* InelasticProcess::PostStepDoIt( const G4Track& aTrack,
                                                    const G4Step& aStep) {
 
 
-    G4cout << "hello from PostStepDoIt" << G4endl;
     const DRAGONDetectorConstruction* detectorConstruction
             = static_cast<const DRAGONDetectorConstruction*>
             (G4RunManager::GetRunManager()->GetUserDetectorConstruction());
@@ -228,12 +227,9 @@ void InelasticProcess::StartTracking(G4Track* track) {
         }
         goodCS = true;
 //       G4cout << "fScatterStartTracking " << fScatter << G4endl;
-    }
-//    fScatteringEnergy = (fCMScatteringEnergy>0.) ? (fCMScatteringEnergy*(4.+6.)/4.) : track->GetKineticEnergy()*G4UniformRand()/MeV;
-//     G4cout << "fCMScattering Energy: " <<fCMScatteringEnergy << G4endl;
-//     G4cout << "fScattering Energy: " <<fScatteringEnergy << G4endl; */
+    }*/
+    fScatteringEnergy = (fCMScatteringEnergy>0.) ? (fCMScatteringEnergy*(4.+6.)/4.) : track->GetKineticEnergy()*G4UniformRand()/MeV;
 //     G4cout << "fCMScattering Energy: " << fCMScatteringEnergy << '\t' << fLightProductCharge << " " << fLightProductMass << '\t' << fHeavyProductCharge << " " << fHeavyProductMass << G4endl;
-//     G4cout << "QValue: " << fQValue << G4endl;
 }
 
 void InelasticProcess::ParseParams(std::map<std::string,double> &params) {

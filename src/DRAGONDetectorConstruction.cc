@@ -42,12 +42,13 @@
 
 DRAGONDetectorConstruction::DRAGONDetectorConstruction() :
         G4VUserDetectorConstruction(),
-        fPressureInTorr(1700.),
+        fPressureInTorr(4.7),
         fTemperature(293.15),
         fDriftGap(6.0) {
 }
 
 DRAGONDetectorConstruction::~DRAGONDetectorConstruction() {
+    G4cout << "Pressure: " << fPressureInTorr << G4endl;
 }
 
 G4VPhysicalVolume* DRAGONDetectorConstruction::Construct() {
@@ -60,7 +61,7 @@ G4VPhysicalVolume* DRAGONDetectorConstruction::Construct() {
 
     //Gas mixtures
     double volFracHe = 1.00;
-    double volFracCO2 = 0.04;
+    double volFracCO2 = 0.00;
 
     double molarMassHe = 4.0026020;
     double molarMassCO2 = 44.01;

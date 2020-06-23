@@ -52,6 +52,8 @@ void DRAGONActionInitialization::Build() const {
   DRAGONTrackingAction *trackingAction = new DRAGONTrackingAction;
   trackingAction->SetRecoilMassCharge(fRecoilMass,fRecoilCharge);
   SetUserAction(trackingAction);
+  DRAGONEventAction* eventAction = new DRAGONEventAction(new DRAGONRunAction);
+  SetUserAction(eventAction);
 }
 
 void DRAGONActionInitialization::SetRecoilMassCharge(G4double mass, G4double charge) {

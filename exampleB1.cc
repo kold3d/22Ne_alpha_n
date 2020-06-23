@@ -41,6 +41,7 @@
 #include "G4hIonisation.hh"
 #include "G4hMultipleScattering.hh"
 #include "G4VProcess.hh"
+#include "G4HadronicProcessStore.hh"
 
 #ifdef G4MULTITHREADED
 #include "G4MTRunManager.hh"
@@ -63,6 +64,7 @@
 
 int main(int argc,char** argv)
 {
+    G4HadronicProcessStore::Instance()->SetVerbose(0);
     G4double recoilMass = 4.;
     G4double recoilCharge = 2.;
 
@@ -95,6 +97,9 @@ int main(int argc,char** argv)
     reactionParams["targetCharge"] = config["target"][0].asDouble();
     reactionParams["targetMass"] = config["target"][1].asDouble();
     reactionParams["cmEnergy"] = config["cmEnergy"].asDouble();
+
+    DRAGONDetectorConstruction* detector = new DRAGONDetectorConstruction();
+    detector->SetGasPressure(gasPressure);
 
     G4long seed = time(NULL);
     seed+=473879*processNumber;
@@ -149,6 +154,7 @@ int main(int argc,char** argv)
     DRAGONActionInitialization* actionInitialization = new DRAGONActionInitialization;
     actionInitialization->SetRecoilMassCharge(recoilMass,recoilCharge);
     runManager->SetUserInitialization(actionInitialization);
+
 
     // Initialize Geant4 kernel
     runManager->Initialize();
