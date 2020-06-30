@@ -68,8 +68,8 @@ G4VPhysicalVolume* DRAGONDetectorConstruction::Construct() {
 
     double massFracHe = volFracHe*molarMassHe/(volFracHe*molarMassHe+volFracCO2*molarMassCO2);
     double massFracCO2 = volFracCO2*molarMassCO2/(volFracHe*molarMassHe+volFracCO2*molarMassCO2);
-//    double gasDensity = 1.603e-05*fPressureInTorr*(volFracHe*molarMassHe+volFracCO2*molarMassCO2)/fTemperature*g/cm3;
-    double gasDensity = 2.20865e-06*fPressureInTorr*(volFracHe*molarMassHe+volFracCO2*molarMassCO2)/fTemperature*g/cm3;
+    double gasDensity = 1.603e-05*fPressureInTorr*(volFracHe*molarMassHe+volFracCO2*molarMassCO2)/fTemperature*g/cm3;
+//    double gasDensity = 2.20865e-06*fPressureInTorr*(volFracHe*molarMassHe+volFracCO2*molarMassCO2)/fTemperature*g/cm3;
     fGasMaterial = new G4Material("He_CO2",gasDensity,2);
     fGasMaterial->AddMaterial(he,massFracHe);
     fGasMaterial->AddMaterial(co2,massFracCO2);
