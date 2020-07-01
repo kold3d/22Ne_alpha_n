@@ -42,7 +42,7 @@
 
 DRAGONDetectorConstruction::DRAGONDetectorConstruction() :
         G4VUserDetectorConstruction(),
-        fPressureInTorr(4.7),
+        fPressureInTorr(5),
         fTemperature(293.15),
         fDriftGap(6.0) {
 }
@@ -68,8 +68,10 @@ G4VPhysicalVolume* DRAGONDetectorConstruction::Construct() {
 
     double massFracHe = volFracHe*molarMassHe/(volFracHe*molarMassHe+volFracCO2*molarMassCO2);
     double massFracCO2 = volFracCO2*molarMassCO2/(volFracHe*molarMassHe+volFracCO2*molarMassCO2);
-    double gasDensity = 1.603e-05*fPressureInTorr*(volFracHe*molarMassHe+volFracCO2*molarMassCO2)/fTemperature*g/cm3;
+//    double gasDensity = 1.603e-05*fPressureInTorr*(volFracHe*molarMassHe+volFracCO2*molarMassCO2)/fTemperature*g/cm3;
 //    double gasDensity = 2.20865e-06*fPressureInTorr*(volFracHe*molarMassHe+volFracCO2*molarMassCO2)/fTemperature*g/cm3;
+//    double gasDensity = 1.0949e-6*g/cm3;      // From LISE++
+    double gasDensity = 1.313732567606E-6*g/cm3;      // From LISE++
     fGasMaterial = new G4Material("He_CO2",gasDensity,2);
     fGasMaterial->AddMaterial(he,massFracHe);
     fGasMaterial->AddMaterial(co2,massFracCO2);
@@ -93,11 +95,13 @@ G4VPhysicalVolume* DRAGONDetectorConstruction::Construct() {
 
     //Create He:CO2 filled world
     G4VSolid* worldSolid
-            = new G4Box("worldBox",.2*m,.2*m,.0123/2.*m);
+            = new G4Box("worldBox",.2*m,.2*m,.123/2.*m);
+//    = new G4Box("worldBox",.2*m,.2*m,.5*m);
     fWorldLogical
             = new G4LogicalVolume(worldSolid,fGasMaterial,"worldLogical");
     G4VPhysicalVolume* worldPhysical
-            = new G4PVPlacement(0,G4ThreeVector(0.,0.,0.0123/2.*m),fWorldLogical,"worldPhysical",fVacuumLogical,
+//            = new G4PVPlacement(0,G4ThreeVector(0.,0.,0.0123/2.*m),fWorldLogical,"worldPhysical",fVacuumLogical,
+            = new G4PVPlacement(0,G4ThreeVector(0.,0.,0.*m),fWorldLogical,"worldPhysical",fVacuumLogical,
                                 false,0,checkOverlaps);
 
 

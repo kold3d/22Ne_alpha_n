@@ -34,7 +34,7 @@
 InelasticProcess::InelasticProcess(const G4String& processName)
         : G4VDiscreteProcess(processName,fHadronic), fScatteringEnergy(1.e6), fCMScatteringEnergy(0.) {
     SetProcessSubType(111);
-    fQValue = 0.;
+//    fQValue = -0.478;
 }
 
 InelasticProcess::~InelasticProcess() {
@@ -55,14 +55,14 @@ G4double InelasticProcess::GetMeanFreePath(const G4Track& aTrack,
 
 
     G4double mfp = (energy>fScatteringEnergy ||
-                    aTrack.GetTrackID()>1) ? DBL_MAX : mfp;
+                    aTrack.GetTrackID()>1) ? DBL_MAX : 0;
     *condition = NotForced;
+    G4cout << "energy: " << energy << '\t' << '\t' << "QValue: " << fQValue <<  '\t' << "fScatteringE: " << fScatteringEnergy << '\t' << "MFP: " << mfp << G4endl;
     return mfp;
 }
 
 G4VParticleChange* InelasticProcess::PostStepDoIt( const G4Track& aTrack,
                                                    const G4Step& aStep) {
-
 
     const DRAGONDetectorConstruction* detectorConstruction
             = static_cast<const DRAGONDetectorConstruction*>
@@ -92,15 +92,16 @@ G4VParticleChange* InelasticProcess::PostStepDoIt( const G4Track& aTrack,
   G4DynamicParticle* lightRec = new G4DynamicParticle;                      //Creating a G4DynamicParticle to extract 4-Momentum
     G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
     G4ParticleDefinition* light;
-    if(particleTable->GetIonTable()->FindIon(fLightProductCharge,fLightProductMass,0.0))
-        light = particleTable->GetIonTable()->FindIon(fLightProductCharge,fLightProductMass,0.0);
-    else light = particleTable->GetIonTable()->GetIon(fLightProductCharge,fLightProductMass,0.0);
-  lightRec->SetDefinition(light);                                           //Filling in the definitions of the G4Dynamicparticle
+//    if(particleTable->GetIonTable()->FindIon(fLightProductCharge,fLightProductMass,0.0))
+//        light = particleTable->GetIonTable()->FindIon(fLightProductCharge,fLightProductMass,0.0);
+//    else light = particleTable->GetIonTable()->GetIon(fLightProductCharge,fLightProductMass,0.0);
+    light = particleTable->FindParticle("neutron");
+    lightRec->SetDefinition(light);                                           //Filling in the definitions of the G4Dynamicparticle
 
     fenergy_cm_rounded = roundf(energy*fTargetMass/(projectileMass+fTargetMass)*100.)/100.;
-    if (fenergy_cm_rounded < 2. || fenergy_cm_rounded > 8.) {
-        return G4VDiscreteProcess::PostStepDoIt(aTrack,aStep);
-    }
+//    if (fenergy_cm_rounded < 2. || fenergy_cm_rounded > 8.) {
+//        return G4VDiscreteProcess::PostStepDoIt(aTrack,aStep);
+//    }
     fDecayE = (fCMScatteringEnergy>0.) ? fCMScatteringEnergy + fQValue : roundf(energy*fTargetMass/(projectileMass+fTargetMass)*100.)/100. + fQValue;
 
     G4double randAngle = 180.*G4UniformRand();           //Included for the file 0-180 degrees.
@@ -108,8 +109,8 @@ G4VParticleChange* InelasticProcess::PostStepDoIt( const G4Track& aTrack,
             fCMTheta = (fQValue ==0) ? 180. - randAngle : randAngle;
     G4double aAngleLightCM = 2*3.14159*G4UniformRand();                     // Isotropic distribution
     G4double pAngleLightCM = fCMTheta*3.14159/180.;
-//  fExEnergy = fabs(fQValue)*MeV;
-    fExEnergy = 0.;
+  fExEnergy = fabs(fQValue)*MeV;
+//    fExEnergy = 0.;
 
 //  printf("TotalE: %f, ExEnergy: %f\n", totalEnergy, fExEnergy);
 
@@ -131,7 +132,6 @@ G4VParticleChange* InelasticProcess::PostStepDoIt( const G4Track& aTrack,
     if (v.getR()>0) dir.rotate(v,rotAngle);
 
     if(fCMScatteringEnergy<0.) return &aParticleChange; //sub-threshold
-//    if(fCMScatteringEnergy<1.8) return &aParticleChange; //sub-threshold
     G4double LightProductMass = fLightProductMass * 931.5*MeV;
     G4double HeavyProductMass = fHeavyProductMass * 931.5*MeV;
     G4double pLight = sqrt(2.*LightProductMass*fDecayE*(1.*HeavyProductMass/(LightProductMass+HeavyProductMass)));      //E_1 = m2/(m1+m2)* E_t
@@ -140,11 +140,10 @@ G4VParticleChange* InelasticProcess::PostStepDoIt( const G4Track& aTrack,
     G4ThreeVector pNewHeavy = -pNewLight;
     G4ThreeVector pN = aTrack.GetMomentum();
 
-    G4cout << "incomingP: " << pN << '\t' << "outgoingP: " << pNewLight << '\t' << pNewHeavy << "kLight: " << pow(pNewLight.getR(),2.)/(2.*LightProductMass)/MeV << "kHeavy: " << pow(pNewHeavy.getR(),2.)/(2.*HeavyProductMass)/MeV << G4endl;
 
     pNewLight += pN * (1. * LightProductMass/(LightProductMass+HeavyProductMass));
     pNewHeavy += pN * (1. * HeavyProductMass/(LightProductMass+HeavyProductMass));
-//    G4cout << "incomingPLab: " << pN << '\t' << "outgoingPLab: " << pNewLight << '\t' << pNewHeavy << "kLightLab: " << pow(pNewLight.getR(),2.)/(2.*LightProductMass)/MeV << "kHeavyLab: " << pow(pNewHeavy.getR(),2.)/(2.*HeavyProductMass)/MeV << G4endl;
+    G4cout << "incomingPLab: " << pN << '\t' << "outgoingPLab: " << pNewLight << '\t' << pNewHeavy << "kLightLab: " << pow(pNewLight.getR(),2.)/(2.*LightProductMass)/MeV << "kHeavyLab: " << pow(pNewHeavy.getR(),2.)/(2.*HeavyProductMass)/MeV << G4endl;
 
     lightRec->SetMomentum(pNewLight);
     heavyRec->SetMomentum(pNewHeavy);
@@ -228,7 +227,7 @@ void InelasticProcess::StartTracking(G4Track* track) {
         goodCS = true;
 //       G4cout << "fScatterStartTracking " << fScatter << G4endl;
     }*/
-    fScatteringEnergy = (fCMScatteringEnergy>0.) ? (fCMScatteringEnergy*(4.+6.)/4.) : track->GetKineticEnergy()*G4UniformRand()/MeV;
+    fScatteringEnergy = (fCMScatteringEnergy>0.) ? (fCMScatteringEnergy*(4.+22.)/4.) : track->GetKineticEnergy()*G4UniformRand()/MeV;
 //     G4cout << "fCMScattering Energy: " << fCMScatteringEnergy << '\t' << fLightProductCharge << " " << fLightProductMass << '\t' << fHeavyProductCharge << " " << fHeavyProductMass << G4endl;
 }
 
