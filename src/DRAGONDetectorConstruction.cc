@@ -39,6 +39,7 @@
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
 #include "G4SystemOfUnits.hh"
+#include "G4UserLimits.hh"
 
 DRAGONDetectorConstruction::DRAGONDetectorConstruction() :
         G4VUserDetectorConstruction(),
@@ -88,24 +89,26 @@ G4VPhysicalVolume* DRAGONDetectorConstruction::Construct() {
     //Overlaps flag
     G4bool checkOverlaps = false;
 
-    //Create a vacuum filled world
-    G4VSolid* vacuumSolid = new G4Box("vacuumBox", 1.*m,1.*m,1.*m);
-    fVacuumLogical = new G4LogicalVolume(vacuumSolid, vacuum, "vacuumLogical");
-    G4VPhysicalVolume* vacuumPhysical = new G4PVPlacement(0,G4ThreeVector(),fVacuumLogical,"vacuumPhysical",0,false,0,checkOverlaps);
+//    //Create a vacuum filled world
+//    G4VSolid* vacuumSolid = new G4Box("vacuumBox", 1.*m,1.*m,1.*m);
+//    fVacuumLogical = new G4LogicalVolume(vacuumSolid, vacuum, "vacuumLogical");
+//    G4VPhysicalVolume* vacuumPhysical = new G4PVPlacement(0,G4ThreeVector(),fVacuumLogical,"vacuumPhysical",0,false,0,checkOverlaps);
 
-    //Create He:CO2 filled world
+    //Create He filled world
     G4VSolid* worldSolid
-            = new G4Box("worldBox",.2*m,.2*m,.123/2.*m);
-//    = new G4Box("worldBox",.2*m,.2*m,.5*m);
+            = new G4Box("worldBox",.2*m,.2*m,.123/2*m);
     fWorldLogical
             = new G4LogicalVolume(worldSolid,fGasMaterial,"worldLogical");
     G4VPhysicalVolume* worldPhysical
 //            = new G4PVPlacement(0,G4ThreeVector(0.,0.,0.0123/2.*m),fWorldLogical,"worldPhysical",fVacuumLogical,
-            = new G4PVPlacement(0,G4ThreeVector(0.,0.,0.*m),fWorldLogical,"worldPhysical",fVacuumLogical,
+            = new G4PVPlacement(0,G4ThreeVector(0.,0,.0*m),fWorldLogical,"worldPhysical",0,
                                 false,0,checkOverlaps);
 
+    G4double maxstep = 0.0001*mm;
+    G4UserLimits* userLimits = new G4UserLimits(maxstep);
+    fWorldLogical->SetUserLimits(userLimits);
 
-    return vacuumPhysical;
+    return worldPhysical;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

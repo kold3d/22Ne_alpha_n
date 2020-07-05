@@ -31,6 +31,9 @@
 #include "G4Material.hh"
 #include "G4UnitsTable.hh"
 
+#include <iostream>
+#include <fstream>
+
 InelasticProcess::InelasticProcess(const G4String& processName)
         : G4VDiscreteProcess(processName,fHadronic), fScatteringEnergy(1.e6), fCMScatteringEnergy(0.) {
     SetProcessSubType(111);
@@ -56,6 +59,7 @@ G4double InelasticProcess::GetMeanFreePath(const G4Track& aTrack,
 
     G4double mfp = (energy>fScatteringEnergy ||
                     aTrack.GetTrackID()>1) ? DBL_MAX : 0;
+
     *condition = NotForced;
     G4cout << "energy: " << energy << '\t' << '\t' << "QValue: " << fQValue <<  '\t' << "fScatteringE: " << fScatteringEnergy << '\t' << "MFP: " << mfp << G4endl;
     return mfp;
@@ -63,6 +67,7 @@ G4double InelasticProcess::GetMeanFreePath(const G4Track& aTrack,
 
 G4VParticleChange* InelasticProcess::PostStepDoIt( const G4Track& aTrack,
                                                    const G4Step& aStep) {
+
 
     const DRAGONDetectorConstruction* detectorConstruction
             = static_cast<const DRAGONDetectorConstruction*>
@@ -145,6 +150,11 @@ G4VParticleChange* InelasticProcess::PostStepDoIt( const G4Track& aTrack,
     pNewHeavy += pN * (1. * HeavyProductMass/(LightProductMass+HeavyProductMass));
     G4cout << "incomingPLab: " << pN << '\t' << "outgoingPLab: " << pNewLight << '\t' << pNewHeavy << "kLightLab: " << pow(pNewLight.getR(),2.)/(2.*LightProductMass)/MeV << "kHeavyLab: " << pow(pNewHeavy.getR(),2.)/(2.*HeavyProductMass)/MeV << G4endl;
 
+    std::ofstream myfile;
+    myfile.open("22Ne_a_n_simOutput.txt", std::ios::app);
+    myfile << "incomingPLab: " << pN << '\t' << "outgoingPLab neutron: " << pNewLight << '\t' << "outputPLab 25Mg: " << pNewHeavy << G4endl;
+    myfile.close();
+
     lightRec->SetMomentum(pNewLight);
     heavyRec->SetMomentum(pNewHeavy);
 
@@ -164,6 +174,7 @@ G4VParticleChange* InelasticProcess::PostStepDoIt( const G4Track& aTrack,
     G4Track* sec1 = new G4Track(lightRec,
                                 aTrack.GetGlobalTime(),
                                 aTrack.GetPosition());
+    G4cout <<"postition: " << sec1->GetPosition() << G4endl;
     G4Track* sec2 = new G4Track(heavyRec,
                                 aTrack.GetGlobalTime(),
                                 aTrack.GetPosition());

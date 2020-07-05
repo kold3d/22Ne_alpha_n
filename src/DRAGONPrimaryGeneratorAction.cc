@@ -57,7 +57,7 @@ DRAGONPrimaryGeneratorAction::~DRAGONPrimaryGeneratorAction() {
 
 void DRAGONPrimaryGeneratorAction:: GeneratePrimaries(G4Event* g4Event) {
     fParticleGun->GeneratePrimaryVertex(g4Event);
-    fParticleGun->SetParticlePosition(G4ThreeVector(0.,0.,-1.0*mm));
+    fParticleGun->SetParticlePosition(G4ThreeVector(0.,0.,0.*mm));
     G4double kinE = 4.5*MeV;
     G4double sigma = kinE*.0025/2.36;
 //        G4double sigma = 0;
