@@ -60,6 +60,8 @@ G4VPhysicalVolume* DRAGONDetectorConstruction::Construct() {
     G4Material* he = nistMgr->FindOrBuildMaterial("G4_He");
     G4Material* co2 = nistMgr->FindOrBuildMaterial("G4_CARBON_DIOXIDE");
 
+    // Specific Gas constant for Helium
+    double gasConstant = 2077.1*joule*kelvin/kg;
     //Gas mixtures
     double volFracHe = 1.00;
     double volFracCO2 = 0.00;
@@ -71,8 +73,8 @@ G4VPhysicalVolume* DRAGONDetectorConstruction::Construct() {
     double massFracCO2 = volFracCO2*molarMassCO2/(volFracHe*molarMassHe+volFracCO2*molarMassCO2);
 //    double gasDensity = 1.603e-05*fPressureInTorr*(volFracHe*molarMassHe+volFracCO2*molarMassCO2)/fTemperature*g/cm3;
 //    double gasDensity = 2.20865e-06*fPressureInTorr*(volFracHe*molarMassHe+volFracCO2*molarMassCO2)/fTemperature*g/cm3;
-//    double gasDensity = 1.0949e-6*g/cm3;      // From LISE++
-    double gasDensity = 1.313732567606E-6*g/cm3;      // From LISE++
+//    double gasDensity = 1.313732567606E-6*g/cm3;      // From LISE++
+    double gasDensity = 1.0947771396717e-6*g/cm3;      // from internets
     fGasMaterial = new G4Material("He_CO2",gasDensity,2);
     fGasMaterial->AddMaterial(he,massFracHe);
     fGasMaterial->AddMaterial(co2,massFracCO2);
@@ -89,10 +91,10 @@ G4VPhysicalVolume* DRAGONDetectorConstruction::Construct() {
     //Overlaps flag
     G4bool checkOverlaps = false;
 
-//    //Create a vacuum filled world
-//    G4VSolid* vacuumSolid = new G4Box("vacuumBox", 1.*m,1.*m,1.*m);
-//    fVacuumLogical = new G4LogicalVolume(vacuumSolid, vacuum, "vacuumLogical");
-//    G4VPhysicalVolume* vacuumPhysical = new G4PVPlacement(0,G4ThreeVector(),fVacuumLogical,"vacuumPhysical",0,false,0,checkOverlaps);
+    //Create a vacuum filled world
+    G4VSolid* vacuumSolid = new G4Box("vacuumBox", 1.*m,1.*m,1.*m);
+    fVacuumLogical = new G4LogicalVolume(vacuumSolid, vacuum, "vacuumLogical");
+    G4VPhysicalVolume* vacuumPhysical = new G4PVPlacement(0,G4ThreeVector(),fVacuumLogical,"vacuumPhysical",0,false,0,checkOverlaps);
 
     //Create He filled world
     G4VSolid* worldSolid
@@ -100,15 +102,15 @@ G4VPhysicalVolume* DRAGONDetectorConstruction::Construct() {
     fWorldLogical
             = new G4LogicalVolume(worldSolid,fGasMaterial,"worldLogical");
     G4VPhysicalVolume* worldPhysical
-//            = new G4PVPlacement(0,G4ThreeVector(0.,0.,0.0123/2.*m),fWorldLogical,"worldPhysical",fVacuumLogical,
-            = new G4PVPlacement(0,G4ThreeVector(0.,0,.0*m),fWorldLogical,"worldPhysical",0,
+            = new G4PVPlacement(0,G4ThreeVector(0.,0.,.123/2.*m),fWorldLogical,"worldPhysical",fVacuumLogical,
+//            = new G4PVPlacement(0,G4ThreeVector(0.,0,.0*m),fWorldLogical,"worldPhysical",0,
                                 false,0,checkOverlaps);
 
     G4double maxstep = 0.0001*mm;
     G4UserLimits* userLimits = new G4UserLimits(maxstep);
     fWorldLogical->SetUserLimits(userLimits);
 
-    return worldPhysical;
+    return vacuumPhysical;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......

@@ -57,7 +57,8 @@ G4double InelasticProcess::GetMeanFreePath(const G4Track& aTrack,
     G4LogicalVolume* currentVolume = aTrack.GetStep()->GetPostStepPoint()->GetTouchableHandle()->GetVolume()->GetLogicalVolume();
 
 
-    G4double mfp = (energy>fScatteringEnergy ||
+    G4double mfp = (world != currentVolume ||
+                    energy>fScatteringEnergy ||
                     aTrack.GetTrackID()>1) ? DBL_MAX : 0;
 
     *condition = NotForced;
@@ -103,11 +104,7 @@ G4VParticleChange* InelasticProcess::PostStepDoIt( const G4Track& aTrack,
     light = particleTable->FindParticle("neutron");
     lightRec->SetDefinition(light);                                           //Filling in the definitions of the G4Dynamicparticle
 
-    fenergy_cm_rounded = roundf(energy*fTargetMass/(projectileMass+fTargetMass)*100.)/100.;
-//    if (fenergy_cm_rounded < 2. || fenergy_cm_rounded > 8.) {
-//        return G4VDiscreteProcess::PostStepDoIt(aTrack,aStep);
-//    }
-    fDecayE = (fCMScatteringEnergy>0.) ? fCMScatteringEnergy + fQValue : roundf(energy*fTargetMass/(projectileMass+fTargetMass)*100.)/100. + fQValue;
+    fDecayE = (fCMScatteringEnergy>0.) ? fCMScatteringEnergy + fQValue : energy*fTargetMass/(projectileMass+fTargetMass) + fQValue;
 
     G4double randAngle = 180.*G4UniformRand();           //Included for the file 0-180 degrees.
         randAngle = (G4double)floor(randAngle*10+0.5)/10.;
