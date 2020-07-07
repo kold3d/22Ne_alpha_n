@@ -49,7 +49,6 @@ DRAGONDetectorConstruction::DRAGONDetectorConstruction() :
 }
 
 DRAGONDetectorConstruction::~DRAGONDetectorConstruction() {
-    G4cout << "Pressure: " << fPressureInTorr << G4endl;
 }
 
 G4VPhysicalVolume* DRAGONDetectorConstruction::Construct() {
@@ -61,23 +60,17 @@ G4VPhysicalVolume* DRAGONDetectorConstruction::Construct() {
     G4Material* co2 = nistMgr->FindOrBuildMaterial("G4_CARBON_DIOXIDE");
 
     // Specific Gas constant for Helium
-    double gasConstant = 2077.1*joule*kelvin/kg;
+//    double gasConstant = 2077.1*joule*kelvin/kg;
     //Gas mixtures
-    double volFracHe = 1.00;
-    double volFracCO2 = 0.00;
-
     double molarMassHe = 4.0026020;
-    double molarMassCO2 = 44.01;
 
-    double massFracHe = volFracHe*molarMassHe/(volFracHe*molarMassHe+volFracCO2*molarMassCO2);
-    double massFracCO2 = volFracCO2*molarMassCO2/(volFracHe*molarMassHe+volFracCO2*molarMassCO2);
-//    double gasDensity = 1.603e-05*fPressureInTorr*(volFracHe*molarMassHe+volFracCO2*molarMassCO2)/fTemperature*g/cm3;
-//    double gasDensity = 2.20865e-06*fPressureInTorr*(volFracHe*molarMassHe+volFracCO2*molarMassCO2)/fTemperature*g/cm3;
+    double gasDensity = 1.603e-05*fPressureInTorr*(molarMassHe)/fTemperature*g/cm3;
 //    double gasDensity = 1.313732567606E-6*g/cm3;      // From LISE++
-    double gasDensity = 1.0947771396717e-6*g/cm3;      // from internets
-    fGasMaterial = new G4Material("He_CO2",gasDensity,2);
-    fGasMaterial->AddMaterial(he,massFracHe);
-    fGasMaterial->AddMaterial(co2,massFracCO2);
+//    double gasDensity = 1.0947771396717e-6*g/cm3;      // from internets
+    fGasMaterial = new G4Material("He_CO2",gasDensity,1);
+    fGasMaterial->AddMaterial(he,1.);
+
+    G4cout << "Pressure: " << fPressureInTorr << '\t' << "Density: " << gasDensity/(g/cm3) << G4endl;
 
     G4Material* vacuum =
             new G4Material("Vacuum",      //Name as String
@@ -85,7 +78,7 @@ G4VPhysicalVolume* DRAGONDetectorConstruction::Construct() {
                            1.008*g/mole,  //Mass per Mole "Atomic Weight"  1.008*g/mole for Hydoren
                            1.e-25*g/cm3,  //Density of Vaccuum  *Cant be Zero, Must be small insted
                            kStateGas,     //kStateGas for Gas
-                           2.73*kelvin,   //Temperatuer for ga
+                           2.73*kelvin,   //Temperatuer for gas
                            1.e-25*g/cm3); //Pressure for Vaccum
 
     //Overlaps flag
@@ -103,7 +96,6 @@ G4VPhysicalVolume* DRAGONDetectorConstruction::Construct() {
             = new G4LogicalVolume(worldSolid,fGasMaterial,"worldLogical");
     G4VPhysicalVolume* worldPhysical
             = new G4PVPlacement(0,G4ThreeVector(0.,0.,.123/2.*m),fWorldLogical,"worldPhysical",fVacuumLogical,
-//            = new G4PVPlacement(0,G4ThreeVector(0.,0,.0*m),fWorldLogical,"worldPhysical",0,
                                 false,0,checkOverlaps);
 
     G4double maxstep = 0.0001*mm;
